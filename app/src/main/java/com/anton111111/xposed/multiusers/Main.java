@@ -30,9 +30,22 @@ public class Main implements IXposedHookZygoteInit, IXposedHookLoadPackage {
             protected void afterHookedMethod(MethodHookParam param) throws Throwable {
                 if ((int)param.getResult() <= 1) {
                     param.setResult(MAX_NUMBER_SUPPORTED_USERS);
-                    XposedBridge.log("Override result of getMaxSupportedUsers to : " + MAX_NUMBER_SUPPORTED_USERS);
+                    //XposedBridge.log("Override result of getMaxSupportedUsers to : " + MAX_NUMBER_SUPPORTED_USERS);
                 }
             }
         });
+        Method supportsMultipleUsersMethod = XposedHelpers.findMethodExact(aClass, "supportsMultipleUsers");
+
+        supportsMultipleUsersMethod.setAccessible(true);
+        XposedBridge.hookMethod(supportsMultipleUsersMethod, new XC_MethodHook() {
+            @Override
+            protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                if (!(boolean)param.getResult()) {
+                    param.setResult(true);
+                    //XposedBridge.log("Override result of supportsMultipleUsers to true");
+                }
+            }
+        });
+
     }
 }
